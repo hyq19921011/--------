@@ -1,0 +1,401 @@
+C51 COMPILER V9.00   MAIN                                                                  06/16/2015 21:32:12 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE source\main.c RTX51 OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Lis
+                    -tings\main.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          
+   2          /***************
+   3          项目名称：电动车充电器控制器
+   4          功能：    根据电池电量的不同合理控制充电电流，保护电池寿命。
+   5          作者：    河南科技大学----黄永全
+   6          日期：    2015/06/04
+   7          **************/
+   8          /**************头文件**************/
+   9          #include <STC15F2K60S2.H>
+  10          #include "main.h"
+  11          #include "stdio.h"
+  12          #include "adc.h"
+  13          #include "led.h"
+  14          #include "key.h"
+  15          #include "pwm_dac.h"
+  16          #include "time.h"
+  17          #include "delay.h"
+  18          #include "usart.h"
+  19          #include "eeprom.h"
+  20          
+  21          /***********系统变量定义**********/
+  22          WORD Time_Base = 0;//系统时基
+  23          SYSTime SYS_Time;  //系统时钟
+  24          BYTE SYS_STEP = 1; //系统执行的步骤
+  25          u16 AD_Time = 0;
+  26          u16 AD = 1023;    //采集回来的AD值
+  27          BYTE DA = 10;      
+  28          BYTE CurrentBase[6] = {0x00,0x80,0x67,0x33,0x19,0};//0\2.5\2.0\1.0\0.5 电流基准
+  29          BYTE VoltageBase[6] = {0x00,0x9a,0xce,0xce,0xb4,0};//0\3\4\4\3.5       电压基准
+  30          WORD CurrentInput[6] = {0x00,0x019f,0x00d1,0x006a,0,0};//0\2\1\0.5\      电流输入信号
+  31          BYTE Current_Base = 0;
+  32          BYTE Voltage_Base = 0;
+  33          BYTE Change_Num = 0; //选择参数项
+  34          BYTE Wait_Flag = 0;
+  35          BYTE Save_Flag = 0;//存储数据的标志
+  36          BYTE Warrning_Flag = 0;//存储数据的标志
+  37          u16 time_wait =0;
+  38          u8  Current_Time = 0;
+  39          
+  40          void user_app()//用户程序
+  41          {
+  42   1          u8 key_stateValue;  
+  43   1          u8* pKeyValue;  
+  44   1          *pKeyValue=0;  
+  45   1          key_stateValue=read_key(pKeyValue); 
+  46   1              if(Key_Lock==1)//锁定键，为1解除锁定，为0锁定
+  47   1              {
+  48   2                      if((*pKeyValue==4)&&(key_stateValue == return_keyPressed) )//调试按键
+  49   2                      {
+  50   3                              SYS_STEP++;
+  51   3                              if(SYS_STEP>5) 
+  52   3                              {
+  53   4                                      SYS_STEP = 1;
+  54   4                              }
+C51 COMPILER V9.00   MAIN                                                                  06/16/2015 21:32:12 PAGE 2   
+
+  55   3                                      
+  56   3                      }
+  57   2                      if((*pKeyValue==3)&&(key_stateValue == return_keyPressed) )//参数选择按键
+  58   2                      {
+  59   3                              Change_Num++;
+  60   3                              if(Change_Num>3) 
+  61   3                              {
+  62   4                                      Save_Flag = 1;  //开始保存数据
+  63   4                                      Change_Num = 0;
+  64   4                              }
+  65   3                                      
+  66   3                      }
+  67   2                      if((key_stateValue == return_keyPressed)||(key_stateValue & return_keyAuto) )//长按键加连发
+  68   2                      {
+  69   3                              if((*pKeyValue==UP)&&(Change_Num!=0))
+  70   3                              {
+  71   4                                      switch(Change_Num)
+  72   4                                      {
+  73   5                                              case 1:CurrentBase[SYS_STEP]++;
+  74   5                      
+  75   5                                                         break;
+  76   5                                              case 2:VoltageBase[SYS_STEP]++;
+  77   5                                                      
+  78   5                                                         break;
+  79   5                                              case 3:CurrentInput[SYS_STEP]++;
+  80   5                                                         
+  81   5                                                              break;
+  82   5      
+  83   5                                      }
+  84   4                              }
+  85   3                              if((*pKeyValue==DOWN)&&(Change_Num!=0))
+  86   3                              {
+  87   4                                      switch(Change_Num)
+  88   4                                      {
+  89   5                                              case 1:CurrentBase[SYS_STEP]--;break;
+  90   5                                              case 2:VoltageBase[SYS_STEP]--;break;
+  91   5                                              case 3:CurrentInput[SYS_STEP]--;break;
+  92   5                                                              
+  93   5                                                      
+  94   5                                      }
+  95   4                              }
+  96   3      
+  97   3                      }
+  98   2              }
+  99   1              
+ 100   1              
+ 101   1              
+ 102   1      }
+ 103          void UserData_Claculite()//用户数据分析，判断该执行第几步
+ 104          {
+ 105   1              
+ 106   1              if( (AD<= CurrentInput[SYS_STEP])&&(SYS_STEP < 4))//如果电流输入信号低于2.0V并且超过10S,前3步执行，
+ 107   1              {
+ 108   2                      if(AD <= 0x2c)//如果电流输入信号低于0.2V暂停计时
+ 109   2                      {
+ 110   3                              Delay_nms(100);
+ 111   3                              while(Get_ad_result(5)<=0x2c)
+ 112   3                              {
+ 113   4                                      TR0 = 0;//暂停计时器
+ 114   4                                      LedShanShuo();
+ 115   4                              }
+ 116   3                              TR0 = 1;//打开计时器
+C51 COMPILER V9.00   MAIN                                                                  06/16/2015 21:32:12 PAGE 3   
+
+ 117   3                      }
+ 118   2                      else
+ 119   2                      {
+ 120   3                              Wait_Flag = 1;
+ 121   3                              if(time_wait>=1000)//超过10S
+ 122   3                              {               
+ 123   4                                      SYS_STEP++;//转到下一步 
+ 124   4                                      Wait_Flag = 0;
+ 125   4                                      time_wait = 0;
+ 126   4                                      Led0 = 0;
+ 127   4                                      if(SYS_STEP == 2)SYS_Time.GHour = 6;//将时间设置到第二阶段的时间6~9小时 
+ 128   4                                      if(SYS_STEP == 3)SYS_Time.GHour = 9;//将时间设置到第二阶段的时间6~9小时 
+ 129   4                                      if(SYS_STEP == 4)SYS_Time.GHour = 12;//将时间设置到第二阶段的时间6~9小时 
+ 130   4                              }
+ 131   3                              if(time_wait>=50)//检测10次防止错误检测
+ 132   3                              {
+ 133   4                                      Led0 = 1;
+ 134   4                                      
+ 135   4                              }
+ 136   3                      }
+ 137   2                      
+ 138   2                                                              
+ 139   2              }
+ 140   1              else
+ 141   1              {
+ 142   2                      Wait_Flag = 0;//关闭等待计时
+ 143   2                      time_wait = 0;
+ 144   2                      Led0 = 0;
+ 145   2              }
+ 146   1      
+ 147   1              
+ 148   1              
+ 149   1      }
+ 150          void main()
+ 151          {
+ 152   1          Key_Init();
+ 153   1              InitUart();
+ 154   1              LedPortInit();
+ 155   1              Timer0Init();
+ 156   1              AD_init();
+ 157   1              PWMn_init();
+ 158   1          while(UserData_Init()) LedShanShuo();
+ 159   1              EA = 1;
+ 160   1              Delay_nms(1000);
+ 161   1              while(1)
+ 162   1              {
+ 163   2      //              EA = 1;
+ 164   2      //              TR0 = 1;
+ 165   2                      AD = Get_ad_result(5);
+ 166   2                      UserData_Claculite();
+ 167   2                      if(Change_Num) Current_Time = 0;//此句是为了在修正是数据输出口不反转用的
+ 168   2                      switch(SYS_STEP)// 整个系统执行流程
+ 169   2                      {
+ 170   3                              case 1://第一阶段 0 ~ 6小时 
+ 171   3                              {
+ 172   4                                      
+ 173   4                                      if(Current_Time<30)//30秒2.5V
+ 174   4                                      {
+ 175   5                                              PWM0_set (0,CurrentBase[SYS_STEP]);
+ 176   5                                              
+ 177   5                                      }
+ 178   4                                      else if(Current_Time<35)
+C51 COMPILER V9.00   MAIN                                                                  06/16/2015 21:32:12 PAGE 4   
+
+ 179   4                                              {
+ 180   5                                                      PWM0_set (0,0x33);//5秒1V
+ 181   5                                              }
+ 182   4                                              else
+ 183   4                                              {
+ 184   5                                                      Current_Time = 0;
+ 185   5                                              }
+ 186   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
+ 187   4                                      if(Change_Num==0)//避免和用户调节是的指示灯互相干扰
+ 188   4                                      {
+ 189   5                                              Led1 = 1;
+ 190   5                                              Led2 = 0;
+ 191   5                                              Led3 = 0;
+ 192   5                                      }
+ 193   4                                      
+ 194   4                                      if(SYS_Time.GHour==6)SYS_STEP++;// 时间到转到下一步                             
+ 195   4                                      break;
+ 196   4                              }
+ 197   3                              case 2://第一阶段 6 ~ 9小时 
+ 198   3                              {
+ 199   4                                      if(Current_Time<30)//30秒2.5V
+ 200   4                                      {
+ 201   5                                              PWM0_set (0,CurrentBase[SYS_STEP]);
+ 202   5                                              
+ 203   5                                      }
+ 204   4                                      else if(Current_Time<35)
+ 205   4                                              {
+ 206   5                                                      PWM0_set (0,0x33);//5秒1V
+ 207   5                                              }
+ 208   4                                              else
+ 209   4                                              {
+ 210   5                                                      Current_Time = 0;
+ 211   5                                              }
+ 212   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
+ 213   4                                      if(Change_Num==0)//避免和用户调节是的指示灯互相干扰
+ 214   4                                      {
+ 215   5                                              Led1 = 0;
+ 216   5                                              Led2 = 1;
+ 217   5                                              Led3 = 0;
+ 218   5                                      }
+ 219   4                                      if(SYS_Time.GHour==9)SYS_STEP++;
+ 220   4                                      break;
+ 221   4                              }                       
+ 222   3                              case 3://第一阶段 9 ~ 12小时 
+ 223   3                              {
+ 224   4                                      if(Current_Time<30)//30秒2.5V
+ 225   4                                      {
+ 226   5                                              PWM0_set (0,CurrentBase[SYS_STEP]);
+ 227   5                                              
+ 228   5                                      }
+ 229   4                                      else if(Current_Time<35)
+ 230   4                                              {
+ 231   5                                                      PWM0_set (0,0x19);//5秒0.5V
+ 232   5                                              }
+ 233   4                                              else
+ 234   4                                              {
+ 235   5                                                      Current_Time = 0;
+ 236   5                                              }
+ 237   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
+ 238   4                                      if(Change_Num==0)//避免和用户调节是的指示灯互相干扰
+ 239   4                                      {
+ 240   5                                              Led1 = 0;
+C51 COMPILER V9.00   MAIN                                                                  06/16/2015 21:32:12 PAGE 5   
+
+ 241   5                                              Led2 = 0;
+ 242   5                                              Led3 = 1;
+ 243   5                                      }
+ 244   4                                      if(SYS_Time.GHour==12)SYS_STEP++;// 时间到转到下一步    
+ 245   4                                      break;
+ 246   4                              }
+ 247   3                              case 4://第一阶段 12 ~ 14小时 
+ 248   3                              {
+ 249   4                                      PWM0_set (0,CurrentBase[SYS_STEP]);
+ 250   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
+ 251   4                                      if(Change_Num==0)//避免和用户调节是的指示灯互相干扰
+ 252   4                                      {
+ 253   5                                              Led1 = 0;
+ 254   5                                              Led2 = 0;
+ 255   5                                              Led3 = 0;
+ 256   5                                      }
+ 257   4                                      if(SYS_Time.GHour==14)SYS_STEP++;// 时间到转到下一步    
+ 258   4                                      break;
+ 259   4                              }
+ 260   3                              case 5://充满
+ 261   3                              {
+ 262   4                                      PWM0_set (0,CurrentBase[0]);
+ 263   4                                      PWM0_set (1,VoltageBase[0]);
+ 264   4                                      if(Change_Num==0)//避免和用户调节是的指示灯互相干扰
+ 265   4                                      {
+ 266   5                                              Led1 = 0;
+ 267   5                                              Led2 = 0;
+ 268   5                                              Led3 = 0;
+ 269   5                                      }
+ 270   4      //                              SYS_STEP = 1;
+ 271   4                                      break;
+ 272   4                              }
+ 273   3                      }
+ 274   2                      switch(Change_Num)
+ 275   2                      {
+ 276   3                              case 1:LedShanShuo1();break;
+ 277   3                              case 2:LedShanShuo2();break;
+ 278   3                              case 3:LedShanShuo3();break;
+ 279   3                              case 0:  break;
+ 280   3                      }
+ 281   2                      if(Save_Flag == 1)
+ 282   2                      {
+ 283   3                              Save_Flag = 0;
+ 284   3                              UserData_Init0();
+ 285   3                              LedShanShuo();
+ 286   3                      }
+ 287   2                                      
+ 288   2                      Delay_nms(10);
+ 289   2                      
+ 290   2              }
+ 291   1      
+ 292   1      }
+ 293          //-----------------------------------------------
+ 294          
+ 295          /* Timer0 interrupt routine */
+ 296          void tm0_isr() interrupt 1 using 1
+ 297          {
+ 298   1              TL0 = T0MS;                     //初始化计时值
+ 299   1          TH0 = T0MS >> 8;
+ 300   1              Time_Base++;
+ 301   1              if(Time_Base>=100)
+ 302   1              {
+C51 COMPILER V9.00   MAIN                                                                  06/16/2015 21:32:12 PAGE 6   
+
+ 303   2                      Time_Base = 0;
+ 304   2                      Current_Time++;//用于输出口1 30秒和5秒重复用
+ 305   2                      SYS_Time.GSeconds++;
+ 306   2                      if(SYS_Time.GSeconds>59) 
+ 307   2                      {
+ 308   3                              SYS_Time.GSeconds=0;
+ 309   3                              SYS_Time.GMintes++;
+ 310   3                      }
+ 311   2                      if(SYS_Time.GMintes>59) 
+ 312   2                      {
+ 313   3                              SYS_Time.GMintes=0;
+ 314   3                              SYS_Time.GHour++;
+ 315   3                      }
+ 316   2                      if(SYS_Time.GHour>23) 
+ 317   2                      {
+ 318   3                              SYS_Time.GHour=0;
+ 319   3                      }
+ 320   2      
+ 321   2              }
+ 322   1              if(Wait_Flag)time_wait++;//执行周期为10ms       
+ 323   1              user_app();                      
+ 324   1      }
+ 325          /*----------------------------
+ 326          UART interrupt service routine
+ 327          ----------------------------*/
+ 328          void Uart_Isr() interrupt 4 using 1
+ 329          {
+ 330   1          if (RI)
+ 331   1          {
+ 332   2              RI = 0;             //Clear receive interrupt flag
+ 333   2              DA = SBUF; 
+ 334   2      //              SendData(DA);
+ 335   2      //              PWM0_set (0,DA);
+ 336   2      //              PWM0_set (1,DA); 
+ 337   2                      if(DA == 0xaa)
+ 338   2                      {
+ 339   3                              IapEraseSector(0x0000);//擦出第一个扇区
+ 340   3                              IapEraseSector(0x0200);//擦出第二个扇区
+ 341   3                      }
+ 342   2                      if(DA == 1)
+ 343   2                      {
+ 344   3                              SendData(CurrentBase[SYS_STEP]);
+ 345   3                              SendData(VoltageBase[SYS_STEP]);
+ 346   3                              SendData(CurrentInput[SYS_STEP]>>8);
+ 347   3                              SendData(CurrentInput[SYS_STEP]&0xff);
+ 348   3                      }
+ 349   2                      if(DA == 2)
+ 350   2                      {
+ 351   3                              SendData(AD>>8);
+ 352   3                              SendData(AD);
+ 353   3                      }
+ 354   2                      if(DA == 3)
+ 355   2                      {
+ 356   3                              SendData(SYS_Time.GHour);
+ 357   3                              SendData(SYS_Time.GMintes);
+ 358   3                              SendData(SYS_Time.GSeconds);
+ 359   3                      }
+ 360   2          }
+ 361   1      }
+ 362           WORD Get_SYSTime()
+ 363          {
+ 364   1              return Time_Base;
+C51 COMPILER V9.00   MAIN                                                                  06/16/2015 21:32:12 PAGE 7   
+
+ 365   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    985    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     44       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

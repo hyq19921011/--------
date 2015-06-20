@@ -1,0 +1,84 @@
+C51 COMPILER V9.00   ADC                                                                   06/17/2015 09:17:26 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE ADC
+OBJECT MODULE PLACED IN .\Objects\adc.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE source\adc.c RTX51 OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\adc.lst) OBJECT(.\Objects\adc.obj)
+
+line level    source
+
+   1          
+   2          #include "adc.h"
+   3          
+   4          void AD_delay(unsigned int n)       //N us延时函数
+   5          {
+   6   1         unsigned int i=0;
+   7   1         for (i=0;i<n;i++)
+   8   1              {
+   9   2                      _nop_();
+  10   2              }
+  11   1      }
+  12          
+  13          
+  14          void AD_init()//10位
+  15          {
+  16   1              P1ASF|=0x20;       //将P1^5口作为ADC功能使用
+  17   1              AUXR1|=0x04;      //0000,0100 令 ADRJ=1，10位A/D转换结果的高2位存放在ADC_RES的低2位中，低8位存放在ADC_RES
+             -L中
+  18   1              ADC_CONTR = 0xE0; //1110,0000 令 ADC_POWER=1，将ADC电源打开， SPEED1，SPEED0：模数转换器转换速度控制位
+  19   1              
+  20   1              ADC_RES=0;     //高八位数据清零,STC12C5A60S2 AD数据寄存名与STC12C54××系列不同
+  21   1              ADC_RESL=0;    //低两位清零
+  22   1              AD_delay(2);      //使输入电压达到稳定
+  23   1              Get_ad_result0(5);
+  24   1              Get_ad_result0(5);
+  25   1              Get_ad_result0(5);
+  26   1      }
+  27          
+  28          WORD Get_ad_result(BYTE channel)
+  29          {
+  30   1              BYTE i;
+  31   1              WORD ad_result=0,total=0;
+  32   1              for(i=0;i<ADC_TIMES;i++)
+  33   1              {
+  34   2                      ADC_CONTR |= ADC_POWER | ADC_SPEEDLL | channel | ADC_START;   //0000,1xxx 令 ADC_START=1, 启动A/D 转换 ;
+             -选择模拟信号输入IO通道
+  35   2                      AD_delay(8);  //使输入电压达到稳定
+  36   2                      while( !(ADC_FLAG & ADC_CONTR) );  //0001,0000, ADC_FLAG ==1测试A/D转换结束否
+  37   2                      ADC_CONTR &= ~ADC_FLAG;  //1110,0111 令 ADC_FLAG=0,清楚AD转换结束标志;令 ADC_START=0, 关闭A/D 转换,
+  38   2                      ad_result=ADC_RES<<2|ADC_RESL;  //高两位与低位数据 结合  ( 0~1023)
+  39   2                      total += ad_result;
+  40   2              }
+  41   1              total=total>>3;
+  42   1              return total;  // 返回 A/D 转换结果
+  43   1      }
+  44          WORD Get_ad_result0(BYTE channel)
+  45          {
+  46   1              u16 ad_result = 0;
+  47   1              
+  48   1                      ADC_CONTR |= ADC_POWER | ADC_SPEEDLL | channel | ADC_START;   //0000,1xxx 令 ADC_START=1, 启动A/D 转换 ;
+             -选择模拟信号输入IO通道
+  49   1                      AD_delay(4);  //使输入电压达到稳定
+  50   1                      while( !(ADC_FLAG & ADC_CONTR) );  //0001,0000, ADC_FLAG ==1测试A/D转换结束否
+  51   1                      ADC_CONTR &= ~ADC_FLAG;  //1110,0111 令 ADC_FLAG=0,清楚AD转换结束标志;令 ADC_START=0, 关闭A/D 转换,
+C51 COMPILER V9.00   ADC                                                                   06/17/2015 09:17:26 PAGE 2   
+
+  52   1                      ad_result=ADC_RES<<2|ADC_RESL;  //高两位与低位数据 结合  ( 0~1023)
+  53   1      
+  54   1              return ad_result;  // 返回 A/D 转换结果
+  55   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    179    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

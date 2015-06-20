@@ -1,0 +1,1 @@
+"source\time.c" RTX51 OPTIMIZE (8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\time.lst) OBJECT(.\Objects\time.obj)

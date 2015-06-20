@@ -1,0 +1,12 @@
+".\Objects\STARTUP.obj",
+".\Objects\main.obj",
+".\Objects\delay.obj",
+".\Objects\adc.obj",
+".\Objects\pwm_dac.obj",
+".\Objects\key.obj",
+".\Objects\time.obj",
+".\Objects\LED.obj",
+".\Objects\eeprom.obj",
+".\Objects\usart.obj" 
+TO ".\Objects\chongdianqi" RTX51 
+PRINT(".\Listings\chongdianqi.m51") RAMSIZE(256) 

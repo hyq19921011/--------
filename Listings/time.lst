@@ -1,0 +1,45 @@
+C51 COMPILER V9.00   TIME                                                                  06/10/2015 21:32:44 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE TIME
+OBJECT MODULE PLACED IN .\Objects\time.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE source\time.c RTX51 OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Lis
+                    -tings\time.lst) OBJECT(.\Objects\time.obj)
+
+line level    source
+
+   1          #include <STC15F2K60S2.H>
+   2          //-----------------------------------------------
+   3          #include "time.h"
+   4          #include "main.h"
+   5          #include "led.h"
+   6          
+   7          void Timer0Init()//定时器1初始化
+   8          {
+   9   1          AUXR |= 0x00;                   //定时器0工作在12T模式下
+  10   1      
+  11   1          TMOD = 0x01;                    //设置定时器模式1(16位自动重装)
+  12   1          TL0 = T0MS;                     //初始化计时值
+  13   1          TH0 = T0MS >> 8;
+  14   1          TR0 = 1;                        //定时器0开始计时
+  15   1          ET0 = 1;                        //使能定时器0中断
+  16   1         
+  17   1      }
+  18          
+  19          
+  20          
+  21          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     14    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

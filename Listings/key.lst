@@ -1,0 +1,151 @@
+C51 COMPILER V9.00   KEY                                                                   06/05/2015 21:25:59 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE KEY
+OBJECT MODULE PLACED IN .\Objects\key.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE source\key.c RTX51 OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\key.lst) OBJECT(.\Objects\key.obj)
+
+line level    source
+
+   1          #include "key.h"
+   2          #include "usart.h"
+   3          #include "delay.h"
+   4          void Key_Init()
+   5          {
+   6   1                  P1M0 &= 0xe3;//初始化P12、 P13、 P14为双向口
+   7   1                      P1M1 &= 0xf1;
+   8   1                      
+   9   1      }
+  10          
+  11          /***************************
+  12          函数名称：Key_Scan()
+  13          输入参数：NULL
+  14          返回参数：按键扫描值
+  15          功能说明：扫描按键数值并返回。
+  16          ****************************/
+  17          unsigned char Key_Scan()
+  18          {
+  19   1       if(Key_Up == 0) //加
+  20   1       {
+  21   2                      return 1;
+  22   2          
+  23   2       }
+  24   1       if(Key_Down == 0) //减
+  25   1       {
+  26   2                      return 2;   
+  27   2       }
+  28   1       
+  29   1       if(Key_Choose == 0)  //选择
+  30   1       {      
+  31   2                      return 3;
+  32   2        
+  33   2       }
+  34   1       if(Key_Debug == 0)  //选择
+  35   1       {      
+  36   2                      return 4;
+  37   2        
+  38   2       }
+  39   1       return 0;    //没有键按下 随便给的数值没特殊意义
+  40   1      }
+  41          
+  42          BYTE read_key(u8* pKeyValue)               
+  43          {  
+  44   1          static u8  s_u8keyState=0;        //未按，普通短按，长按，连发  
+  45   1          static u16 s_u16keyTimeCounts=0;  //未在计时状态的计数器
+  46   1          static u8  s_u8LastKey = key_up ; //历史数据
+  47   1        
+  48   1          u8 keyTemp=0;               //键对应io的电平  
+  49   1          u8 key_return=0;            //函数返回值 
+  50   1          keyTemp=Key_Scan();  //提取所有key对应的io口  
+  51   1              Delay_nms(1);
+  52   1          switch(s_u8keyState)           //这里检测到的是先前的状态，即无动作 
+  53   1          {  
+  54   2              case state_keyUp:   //如果先前是初始态  
+C51 COMPILER V9.00   KEY                                                                   06/05/2015 21:25:59 PAGE 2   
+
+  55   2              {  
+  56   3                  if(keyTemp!=key_up) //如果键被按下
+  57   3                  {  
+  58   4                      s_u8keyState=state_keyDown; //更新键的状态，普通被按下  
+  59   4                  }  
+  60   3              }  
+  61   2              break;  
+  62   2                
+  63   2              case state_keyDown: //如果先前是被按着的  
+  64   2              {  
+  65   3                  if(key_up!=keyTemp) //如果现在还是被按着  
+  66   3                  {  
+  67   4                      s_u8keyState=state_keyTime; //转换到计时态  
+  68   4                      s_u16keyTimeCounts=0;  
+  69   4                      s_u8LastKey = keyTemp;     //保存键值  
+  70   4                  }  
+  71   3                  else  
+  72   3                  {  
+  73   4                      s_u8keyState=state_keyUp; //键没被按着，回到初始态，说明是干扰  
+  74   4                  }  
+  75   3              }  
+  76   2              break;  
+  77   2                
+  78   2              case state_keyTime:  //如果先前已经转换到计时态  
+  79   2              {  //如果真是手动按键，必然进入到本代码块，并且会多次进入  
+  80   3                  if(key_up==keyTemp) //如果未按键 
+  81   3                  {  
+  82   4                      s_u8keyState=state_keyUp;   
+  83   4                      key_return=return_keyPressed;    //返回2，一次完整的普通按键 
+  84   4                      //程序进入这个语句块，说明已经有2次以上10MS的中断，等于已经消抖 
+  85   4                      //那么此时检测到按键被释放，说明是一次普通的短按  
+  86   4                  }  
+  87   3                  else  //在计时状态，检测到键还被按着  
+  88   3                  {  
+  89   4                      if(++s_u16keyTimeCounts>key_longTimes) //时间达到2秒  
+  90   4                      {  
+  91   5                          s_u8keyState=state_keyLong;  //进入产按键状态  
+  92   5                          s_u16keyTimeCounts=0;        //技术器清零，便于进入连发重新计数  
+  93   5                          key_return=return_keyLong;   //返回state_keyLong  
+  94   5                      }  
+  95   4                 
+  96   4                  }  
+  97   3              }  
+  98   2              break;  
+  99   2                
+ 100   2              case state_keyLong:  //在长安状态检测连发 ,每0.2秒发一次 
+ 101   2              {  
+ 102   3                  if(key_up==keyTemp)   
+ 103   3                  {  
+ 104   4                     s_u8keyState=state_keyUp;   
+ 105   4                  }  
+ 106   3                  else //按键时间超过2秒时 
+ 107   3                  {  
+ 108   4                      if(++s_u16keyTimeCounts>key_autoTimes)//10*key_autoTimes
+ 109   4                      {  
+ 110   5                          s_u16keyTimeCounts=0;  
+ 111   5                          key_return=return_keyAuto;  //每0.2秒返回值的第二位置位  
+ 112   5                      }//连发的时候伴随着长按  
+ 113   4                  }  
+ 114   3                  key_return |= return_keyLong;  //0x02????,0x04|0x02????  
+ 115   3              }  
+ 116   2              break;  
+C51 COMPILER V9.00   KEY                                                                   06/05/2015 21:25:59 PAGE 3   
+
+ 117   2                
+ 118   2              default:  
+ 119   2              break;  
+ 120   2          }  
+ 121   1          *pKeyValue = s_u8LastKey ; //返回键值 
+ 122   1          return key_return;  
+ 123   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    193    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4       5
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

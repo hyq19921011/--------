@@ -1,0 +1,86 @@
+C51 COMPILER V9.00   PWM_DAC                                                               06/04/2015 12:58:23 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE PWM_DAC
+OBJECT MODULE PLACED IN .\Objects\pwm_dac.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE source\pwm_dac.c RTX51 OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\
+                    -Listings\pwm_dac.lst) OBJECT(.\Objects\pwm_dac.obj)
+
+line level    source
+
+   1          /*******
+   2          占用端口P10、P11
+   3          *******/
+   4          
+   5          #include "pwm_dac.h"
+   6                  /*
+   7                  #define PCACLK0     0x00        //Fosc/12
+   8                  #define PCACLK1     0x02        //Fosc/2
+   9                  #define PCACLK2     0x04        //???0????
+  10                  #define PCACLK3     0x06        //ECI????
+  11                  #define PCACLK4     0x08        //Fosc/1
+  12                  #define PCACLK5     0x0a        //Fosc/4
+  13                  #define PCACLK6     0x0c        //Fosc/6
+  14                  #define PCACLK7     0x0e        //Fosc/8
+  15                  */
+  16          void PWMn_init()//PWM初始化
+  17          {
+  18   1               P1M1 &= ~0x03,  P1M0 |=  0x03; 
+  19   1              CCON = 0;                       //Initial PCA control register
+  20   1                                          //PCA timer stop running
+  21   1                                          //Clear CF flag
+  22   1                                          //Clear all module interrupt flag
+  23   1          CL = 0;                         //Reset PCA base timer
+  24   1          CH = 0;
+  25   1          CMOD=0x02; //Fosc/2
+  26   1              CCAPM0=0x42; //PWM0??PCA?????PWM??(0100 0010)
+  27   1              CCAPM1=0x42; //PWM1??PCA?????PWM??(0100 0010)
+  28   1              CR=1; //??PCA???
+  29   1      }
+  30          
+  31          void PWM0_set (BYTE chanel,BYTE zkb)
+  32          {
+  33   1      
+  34   1              if(chanel==0)
+  35   1              {               
+  36   2                      CCAP0H=CCAP0L=255-zkb;//2.55*zkb; 
+  37   2      
+  38   2              }
+  39   1              if(chanel==1)
+  40   1              {               
+  41   2                      CCAP1H=CCAP1L=255-zkb;//2.55*zkb; 
+  42   2                       
+  43   2              }
+  44   1              
+  45   1      }
+  46          
+  47          void Set_Speed(int pwm)//pwm??? ??0 ??;??0??; 
+  48          {
+  49   1              if(pwm>=0)
+  50   1              {
+  51   2                      PWM0_set(0,0);//??
+  52   2                      PWM0_set(1,pwm);
+  53   2              }
+  54   1              if(pwm<=0)
+C51 COMPILER V9.00   PWM_DAC                                                               06/04/2015 12:58:23 PAGE 2   
+
+  55   1              {
+  56   2                      PWM0_set(1,0);//??
+  57   2                      PWM0_set(0,-pwm);
+  58   2                      
+  59   2              }
+  60   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     99    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
