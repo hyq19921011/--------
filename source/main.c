@@ -24,10 +24,14 @@ SYSTime SYS_Time;  //系统时钟
 BYTE SYS_STEP = 1; //系统执行的步骤
 u16 AD_Time = 0;
 u16 AD = 1023;    //采集回来的AD值
+u16 AD0 = 1023;   //异常情况采集
 BYTE DA = 10;      
-BYTE CurrentBase[6] = {0x00,0x80,0x67,0x33,0x19,0};//0\2.5\2.0\1.0\0.5 电流基准
-BYTE VoltageBase[6] = {0x00,0x9a,0xce,0xce,0xb4,0};//0\3\4\4\3.5       电压基准
-WORD CurrentInput[6] = {0x00,0x019f,0x00d1,0x006a,0,0};//0\2\1\0.5\      电流输入信号
+//BYTE CurrentBase[6] = {0x00,0x80,0x67,0x33,0x19,0};//0\2.5\2.0\1.0\0.5 电流基准
+//BYTE VoltageBase[6] = {0x00,0x9a,0xce,0xce,0xb4,0};//0\3\4\4\3.5       电压基准
+//WORD CurrentInput[6] = {0x00,0x019f,0x00d1,0x006a,0,0};//0\2\1\0.5\      电流输入信号
+BYTE CurrentBase[6] = {0x00,0x9a,0x80,0x4d,0x19,0};//0\3\2.5\1.5\1 电流基准
+BYTE VoltageBase[6] = {0x00,0xb8,0xce,0xce,0xb8,0};//0\3.6\4\4\3.6       电压基准
+WORD CurrentInput[6] = {0x00,0x0200,0x010a,0x00d1,0,0};//0\2.5\1.3\1.0\   电流输入信号
 BYTE Current_Base = 0;
 BYTE Voltage_Base = 0;
 BYTE Change_Num = 0; //选择参数项
@@ -43,8 +47,8 @@ void user_app()//用户程序
     u8* pKeyValue;  
     *pKeyValue=0;  
     key_stateValue=read_key(pKeyValue); 
-	if(Key_Lock==1)//锁定键，为1解除锁定，为0锁定
-	{
+//	if(Key_Lock==1)//锁定键，为1解除锁定，为0锁定
+//	{
 		if((*pKeyValue==4)&&(key_stateValue == return_keyPressed) )//调试按键
 		{
 			SYS_STEP++;
@@ -95,7 +99,7 @@ void user_app()//用户程序
 			}
 
 		}
-	}
+//	}
 	
 	
 	
@@ -105,18 +109,18 @@ void UserData_Claculite()//用户数据分析，判断该执行第几步
 	
 	if( (AD<= CurrentInput[SYS_STEP])&&(SYS_STEP < 4))//如果电流输入信号低于2.0V并且超过10S,前3步执行，
 	{
-		if(AD <= 0x2c)//如果电流输入信号低于0.2V暂停计时
-		{
-			Delay_nms(100);
-			while(Get_ad_result(5)<=0x2c)
-			{
-				TR0 = 0;//暂停计时器
-				LedShanShuo();
-			}
-			TR0 = 1;//打开计时器
-		}
-		else
-		{
+//		if(AD <= 0x2c)//如果电流输入信号低于0.2V暂停计时
+//		{
+//			Delay_nms(100);
+//			while(Get_ad_result(5)<=0x2c)
+//			{
+//				TR0 = 0;//暂停计时器
+//				LedShanShuo();
+//			}
+//			TR0 = 1;//打开计时器
+//		}
+//		else
+//		{
 			Wait_Flag = 1;
 			if(time_wait>=1000)//超过10S
 			{		
@@ -133,7 +137,7 @@ void UserData_Claculite()//用户数据分析，判断该执行第几步
 				Led0 = 1;
 				
 			}
-		}
+//		}
 		
 							
 	}
@@ -144,7 +148,16 @@ void UserData_Claculite()//用户数据分析，判断该执行第几步
 		Led0 = 0;
 	}
 
-	
+	if(AD0 <= 615)//如果电流输入信号低于3V暂停计时 0x0267
+	{
+		Delay_nms(100);
+		while(Get_ad_result(5)<=0x2c)
+		{
+			TR0 = 0;//暂停计时器
+			LedShanShuo();
+		}
+		TR0 = 1;//打开计时器
+	}
 	
 }
 void main()
@@ -163,6 +176,7 @@ void main()
 //		EA = 1;
 //		TR0 = 1;
 		AD = Get_ad_result(5);
+		AD0 = Get_ad_result(2);
 		UserData_Claculite();
 		if(Change_Num) Current_Time = 0;//此句是为了在修正是数据输出口不反转用的
 		switch(SYS_STEP)// 整个系统执行流程

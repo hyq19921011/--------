@@ -13,7 +13,7 @@ void AD_delay(unsigned int n)       //N us延时函数
 
 void AD_init()//10位
 {
-	P1ASF|=0x20;       //将P1^5口作为ADC功能使用
+	P1ASF|=0x24;       //将P1^5口和1^2作为ADC功能使用
 	AUXR1|=0x04;      //0000,0100 令 ADRJ=1，10位A/D转换结果的高2位存放在ADC_RES的低2位中，低8位存放在ADC_RESL中
 	ADC_CONTR = 0xE0; //1110,0000 令 ADC_POWER=1，将ADC电源打开， SPEED1，SPEED0：模数转换器转换速度控制位
 	

@@ -1,11 +1,16 @@
 #ifndef _key_h_
 #define _key_h_
 #include <STC15F2K60S2.H>
-sbit Key_Up =   P1^2;
-sbit Key_Down=	P1^3;
-sbit Key_Choose=P1^4;
-sbit Key_Debug    =P5^4;//调试按键
-sbit Key_Lock    =P5^5;//锁定定端口
+//sbit Key_Up =   P1^2;
+//sbit Key_Down=	P1^3;
+//sbit Key_Choose=P1^4;
+//sbit Key_Debug    =P5^4;//调试按键
+//sbit Key_Lock    =P5^5;//锁定定端口
+sbit Key_Up =   P1^3;
+sbit Key_Down=	P1^4;
+sbit Key_Choose=P5^4;
+sbit Key_Debug    =P5^5;//调试按键
+//sbit Key_Lock    =P5^5;//锁定定端口
 #define UP     1
 #define DOWN   2
 #define CHOOSE 3
