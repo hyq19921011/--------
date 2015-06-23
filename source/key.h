@@ -6,8 +6,8 @@
 //sbit Key_Choose=P1^4;
 //sbit Key_Debug    =P5^4;//调试按键
 //sbit Key_Lock    =P5^5;//锁定定端口
-sbit Key_Up =   P1^3;
-sbit Key_Down=	P1^4;
+sbit Key_Up =   P1^4;
+sbit Key_Down=	P1^5;
 sbit Key_Choose=P5^4;
 sbit Key_Debug    =P5^5;//调试按键
 //sbit Key_Lock    =P5^5;//锁定定端口

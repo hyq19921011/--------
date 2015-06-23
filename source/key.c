@@ -3,8 +3,8 @@
 #include "delay.h"
 void Key_Init()
 {
-	    P1M0 &= 0xe3;//初始化P12、 P13、 P14为双向口
-		P1M1 &= 0xf1;
+	    P1M0 &= 0xcf;//初始化P14、 P15为双向口
+		P1M1 &= 0xcf;
 		
 }
 

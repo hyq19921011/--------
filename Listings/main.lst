@@ -1,4 +1,4 @@
-C51 COMPILER V9.00   MAIN                                                                  06/20/2015 22:18:00 PAGE 1   
+C51 COMPILER V9.00   MAIN                                                                  06/23/2015 07:53:34 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
@@ -62,347 +62,395 @@ line level    source
   52   1                      if((*pKeyValue==4)&&(key_stateValue == return_keyPressed) )//µ÷ÊÔ°´¼ü
   53   1                      {
   54   2                              SYS_STEP++;
-C51 COMPILER V9.00   MAIN                                                                  06/20/2015 22:18:00 PAGE 2   
+C51 COMPILER V9.00   MAIN                                                                  06/23/2015 07:53:34 PAGE 2   
 
   55   2                              if(SYS_STEP>5) 
   56   2                              {
   57   3                                      SYS_STEP = 1;
   58   3                              }
-  59   2                                      
-  60   2                      }
-  61   1                      if((*pKeyValue==3)&&(key_stateValue == return_keyPressed) )//²ÎÊýÑ¡Ôñ°´¼ü
-  62   1                      {
-  63   2                              Change_Num++;
-  64   2                              if(Change_Num>3) 
-  65   2                              {
-  66   3                                      Save_Flag = 1;  //¿ªÊ¼±£´æÊý¾Ý
-  67   3                                      Change_Num = 0;
-  68   3                              }
-  69   2                                      
-  70   2                      }
-  71   1                      if((key_stateValue == return_keyPressed)||(key_stateValue & return_keyAuto) )//³¤°´¼ü¼ÓÁ¬·¢
-  72   1                      {
-  73   2                              if((*pKeyValue==UP)&&(Change_Num!=0))
-  74   2                              {
-  75   3                                      switch(Change_Num)
-  76   3                                      {
-  77   4                                              case 1:CurrentBase[SYS_STEP]++;
-  78   4                      
-  79   4                                                         break;
-  80   4                                              case 2:VoltageBase[SYS_STEP]++;
-  81   4                                                      
+  59   2                              if(SYS_STEP == 1){SYS_Time.GHour = 0;SYS_Time.GMintes = 0;SYS_Time.GSeconds = 0;}
+  60   2                              if(SYS_STEP == 2){SYS_Time.GHour = 6;SYS_Time.GMintes = 0;SYS_Time.GSeconds = 0;}//½«Ê±¼äÉèÖÃµ½µÚ¶þ½×¶Î
+             -µÄÊ±¼ä6~9Ð¡Ê± 
+  61   2                              if(SYS_STEP == 3){SYS_Time.GHour = 9;SYS_Time.GMintes = 0;SYS_Time.GSeconds = 0;}//½«Ê±¼äÉèÖÃµ½µÚ¶þ½×¶Î
+             -µÄÊ±¼ä6~9Ð¡Ê± 
+  62   2                              if(SYS_STEP == 4){SYS_Time.GHour = 12;SYS_Time.GMintes = 0;SYS_Time.GSeconds = 0;}//½«Ê±¼äÉèÖÃµ½µÚ¶þ½×¶
+             -ÎµÄÊ±¼ä6~9Ð¡Ê±        
+  63   2                      }
+  64   1                      if((*pKeyValue==3)&&(key_stateValue == return_keyPressed) )//²ÎÊýÑ¡Ôñ°´¼ü
+  65   1                      {
+  66   2                              Change_Num++;
+  67   2                              if(Change_Num>3) 
+  68   2                              {
+  69   3                                      Save_Flag = 1;  //¿ªÊ¼±£´æÊý¾Ý
+  70   3                                      Change_Num = 0;
+  71   3                              }
+  72   2                                      
+  73   2                      }
+  74   1                      if((key_stateValue == return_keyPressed)||(key_stateValue & return_keyAuto) )//³¤°´¼ü¼ÓÁ¬·¢
+  75   1                      {
+  76   2                              if((*pKeyValue==UP)&&(Change_Num!=0))
+  77   2                              {
+  78   3                                      switch(Change_Num)
+  79   3                                      {
+  80   4                                              case 1:CurrentBase[SYS_STEP]++;
+  81   4                      
   82   4                                                         break;
-  83   4                                              case 3:CurrentInput[SYS_STEP]++;
-  84   4                                                         
-  85   4                                                              break;
-  86   4      
-  87   4                                      }
-  88   3                              }
-  89   2                              if((*pKeyValue==DOWN)&&(Change_Num!=0))
-  90   2                              {
-  91   3                                      switch(Change_Num)
-  92   3                                      {
-  93   4                                              case 1:CurrentBase[SYS_STEP]--;break;
-  94   4                                              case 2:VoltageBase[SYS_STEP]--;break;
-  95   4                                              case 3:CurrentInput[SYS_STEP]--;break;
-  96   4                                                              
-  97   4                                                      
-  98   4                                      }
-  99   3                              }
- 100   2      
- 101   2                      }
- 102   1      //      }
- 103   1              
- 104   1              
- 105   1              
- 106   1      }
- 107          void UserData_Claculite()//ÓÃ»§Êý¾Ý·ÖÎö£¬ÅÐ¶Ï¸ÃÖ´ÐÐµÚ¼¸²½
- 108          {
- 109   1              
- 110   1              if( (AD<= CurrentInput[SYS_STEP])&&(SYS_STEP < 4))//Èç¹ûµçÁ÷ÊäÈëÐÅºÅµÍÓÚ2.0V²¢ÇÒ³¬¹ý10S,Ç°3²½Ö´ÐÐ£¬
- 111   1              {
- 112   2      //              if(AD <= 0x2c)//Èç¹ûµçÁ÷ÊäÈëÐÅºÅµÍÓÚ0.2VÔÝÍ£¼ÆÊ±
- 113   2      //              {
- 114   2      //                      Delay_nms(100);
- 115   2      //                      while(Get_ad_result(5)<=0x2c)
- 116   2      //                      {
-C51 COMPILER V9.00   MAIN                                                                  06/20/2015 22:18:00 PAGE 3   
+  83   4                                              case 2:VoltageBase[SYS_STEP]++;
+  84   4                                                      
+  85   4                                                         break;
+  86   4                                              case 3:CurrentInput[SYS_STEP]++;
+  87   4                                                         
+  88   4                                                              break;
+  89   4      
+  90   4                                      }
+  91   3                              }
+  92   2                              if((*pKeyValue==DOWN)&&(Change_Num!=0))
+  93   2                              {
+  94   3                                      switch(Change_Num)
+  95   3                                      {
+  96   4                                              case 1:CurrentBase[SYS_STEP]--;break;
+  97   4                                              case 2:VoltageBase[SYS_STEP]--;break;
+  98   4                                              case 3:CurrentInput[SYS_STEP]--;break;
+  99   4                                                              
+ 100   4                                                      
+ 101   4                                      }
+ 102   3                              }
+ 103   2      
+ 104   2                      }
+ 105   1      //      }
+ 106   1              
+ 107   1              
+ 108   1              
+ 109   1      }
+ 110          void UserData_Claculite()//ÓÃ»§Êý¾Ý·ÖÎö£¬ÅÐ¶Ï¸ÃÖ´ÐÐµÚ¼¸²½
+ 111          {
+ 112   1              
+ 113   1              if( (AD<= CurrentInput[SYS_STEP])&&(SYS_STEP < 4))//Èç¹ûµçÁ÷ÊäÈëÐÅºÅµÍÓÚ2.0V²¢ÇÒ³¬¹ý10S,Ç°3²½Ö´ÐÐ£¬
+C51 COMPILER V9.00   MAIN                                                                  06/23/2015 07:53:34 PAGE 3   
 
- 117   2      //                              TR0 = 0;//ÔÝÍ£¼ÆÊ±Æ÷
- 118   2      //                              LedShanShuo();
- 119   2      //                      }
- 120   2      //                      TR0 = 1;//´ò¿ª¼ÆÊ±Æ÷
- 121   2      //              }
- 122   2      //              else
- 123   2      //              {
- 124   2                              Wait_Flag = 1;
- 125   2                              if(time_wait>=1000)//³¬¹ý10S
- 126   2                              {               
- 127   3                                      SYS_STEP++;//×ªµ½ÏÂÒ»²½ 
- 128   3                                      Wait_Flag = 0;
- 129   3                                      time_wait = 0;
- 130   3                                      Led0 = 0;
- 131   3                                      if(SYS_STEP == 2)SYS_Time.GHour = 6;//½«Ê±¼äÉèÖÃµ½µÚ¶þ½×¶ÎµÄÊ±¼ä6~9Ð¡Ê± 
- 132   3                                      if(SYS_STEP == 3)SYS_Time.GHour = 9;//½«Ê±¼äÉèÖÃµ½µÚ¶þ½×¶ÎµÄÊ±¼ä6~9Ð¡Ê± 
- 133   3                                      if(SYS_STEP == 4)SYS_Time.GHour = 12;//½«Ê±¼äÉèÖÃµ½µÚ¶þ½×¶ÎµÄÊ±¼ä6~9Ð¡Ê± 
- 134   3                              }
- 135   2                              if(time_wait>=50)//¼ì²â10´Î·ÀÖ¹´íÎó¼ì²â
- 136   2                              {
- 137   3                                      Led0 = 1;
- 138   3                                      
- 139   3                              }
- 140   2      //              }
- 141   2                      
- 142   2                                                              
- 143   2              }
- 144   1              else
- 145   1              {
- 146   2                      Wait_Flag = 0;//¹Ø±ÕµÈ´ý¼ÆÊ±
- 147   2                      time_wait = 0;
- 148   2                      Led0 = 0;
- 149   2              }
- 150   1      
- 151   1              if(AD0 <= 615)//Èç¹ûµçÁ÷ÊäÈëÐÅºÅµÍÓÚ3VÔÝÍ£¼ÆÊ± 0x0267
- 152   1              {
- 153   2                      Delay_nms(100);
- 154   2                      while(Get_ad_result(5)<=0x2c)
- 155   2                      {
- 156   3                              TR0 = 0;//ÔÝÍ£¼ÆÊ±Æ÷
- 157   3                              LedShanShuo();
- 158   3                      }
- 159   2                      TR0 = 1;//´ò¿ª¼ÆÊ±Æ÷
- 160   2              }
- 161   1              
- 162   1      }
- 163          void main()
- 164          {
- 165   1          Key_Init();
- 166   1              InitUart();
- 167   1              LedPortInit();
- 168   1              Timer0Init();
- 169   1              AD_init();
- 170   1              PWMn_init();
- 171   1          while(UserData_Init()) LedShanShuo();
- 172   1              EA = 1;
- 173   1              Delay_nms(1000);
- 174   1              while(1)
- 175   1              {
- 176   2      //              EA = 1;
- 177   2      //              TR0 = 1;
- 178   2                      AD = Get_ad_result(5);
-C51 COMPILER V9.00   MAIN                                                                  06/20/2015 22:18:00 PAGE 4   
+ 114   1              {
+ 115   2      //              if(AD <= 0x2c)//Èç¹ûµçÁ÷ÊäÈëÐÅºÅµÍÓÚ0.2VÔÝÍ£¼ÆÊ±
+ 116   2      //              {
+ 117   2      //                      Delay_nms(100);
+ 118   2      //                      while(Get_ad_result(5)<=0x2c)
+ 119   2      //                      {
+ 120   2      //                              TR0 = 0;//ÔÝÍ£¼ÆÊ±Æ÷
+ 121   2      //                              LedShanShuo();
+ 122   2      //                      }
+ 123   2      //                      TR0 = 1;//´ò¿ª¼ÆÊ±Æ÷
+ 124   2      //              }
+ 125   2      //              else
+ 126   2      //              {
+ 127   2                              Wait_Flag = 1;
+ 128   2                              if(time_wait>=1000)//³¬¹ý10S
+ 129   2                              {               
+ 130   3                                      SYS_STEP++;//×ªµ½ÏÂÒ»²½ 
+ 131   3                                      Wait_Flag = 0;
+ 132   3                                      time_wait = 0;
+ 133   3                                      Led0 = 0;
+ 134   3                                      if(SYS_STEP == 2)SYS_Time.GHour = 6;//½«Ê±¼äÉèÖÃµ½µÚ¶þ½×¶ÎµÄÊ±¼ä6~9Ð¡Ê± 
+ 135   3                                      if(SYS_STEP == 3)SYS_Time.GHour = 9;//½«Ê±¼äÉèÖÃµ½µÚ¶þ½×¶ÎµÄÊ±¼ä6~9Ð¡Ê± 
+ 136   3                                      if(SYS_STEP == 4)SYS_Time.GHour = 12;//½«Ê±¼äÉèÖÃµ½µÚ¶þ½×¶ÎµÄÊ±¼ä6~9Ð¡Ê± 
+ 137   3                              }
+ 138   2                              if(time_wait>=50)//¼ì²â10´Î·ÀÖ¹´íÎó¼ì²â
+ 139   2                              {
+ 140   3                                      Led0 = 1;
+ 141   3                                      
+ 142   3                              }
+ 143   2      //              }
+ 144   2                      
+ 145   2                                                              
+ 146   2              }
+ 147   1              else
+ 148   1              {
+ 149   2                      Wait_Flag = 0;//¹Ø±ÕµÈ´ý¼ÆÊ±
+ 150   2                      time_wait = 0;
+ 151   2                      Led0 = 0;
+ 152   2              }
+ 153   1      
+ 154   1              if(AD0 <= 615)//Èç¹ûµçÁ÷ÊäÈëÐÅºÅµÍÓÚ3VÔÝÍ£¼ÆÊ± 0x0267
+ 155   1              {
+ 156   2                      Delay_nms(100);
+ 157   2                      while(Get_ad_result(2)<=615)
+ 158   2                      {
+ 159   3                              TR0 = 0;//ÔÝÍ£¼ÆÊ±Æ÷
+ 160   3                              LedShanShuo();
+ 161   3                      }
+ 162   2                      TR0 = 1;//´ò¿ª¼ÆÊ±Æ÷
+ 163   2              }
+ 164   1              
+ 165   1      }
+ 166          void main()
+ 167          {
+ 168   1          Key_Init();
+ 169   1              InitUart();
+ 170   1              LedPortInit();
+ 171   1              Timer0Init();
+ 172   1              AD_init();
+ 173   1              PWMn_init();
+ 174   1          while(UserData_Init0()) LedShanShuo();
+ 175   1              EA = 1;
+C51 COMPILER V9.00   MAIN                                                                  06/23/2015 07:53:34 PAGE 4   
 
- 179   2                      AD0 = Get_ad_result(2);
- 180   2                      UserData_Claculite();
- 181   2                      if(Change_Num) Current_Time = 0;//´Ë¾äÊÇÎªÁËÔÚÐÞÕýÊÇÊý¾ÝÊä³ö¿Ú²»·´×ªÓÃµÄ
- 182   2                      switch(SYS_STEP)// Õû¸öÏµÍ³Ö´ÐÐÁ÷³Ì
- 183   2                      {
- 184   3                              case 1://µÚÒ»½×¶Î 0 ~ 6Ð¡Ê± 
- 185   3                              {
- 186   4                                      
- 187   4                                      if(Current_Time<30)//30Ãë2.5V
- 188   4                                      {
- 189   5                                              PWM0_set (0,CurrentBase[SYS_STEP]);
- 190   5                                              
- 191   5                                      }
- 192   4                                      else if(Current_Time<35)
- 193   4                                              {
- 194   5                                                      PWM0_set (0,0x33);//5Ãë1V
- 195   5                                              }
- 196   4                                              else
- 197   4                                              {
- 198   5                                                      Current_Time = 0;
- 199   5                                              }
- 200   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
- 201   4                                      if(Change_Num==0)//±ÜÃâºÍÓÃ»§µ÷½ÚÊÇµÄÖ¸Ê¾µÆ»¥Ïà¸ÉÈÅ
- 202   4                                      {
- 203   5                                              Led1 = 1;
- 204   5                                              Led2 = 0;
- 205   5                                              Led3 = 0;
- 206   5                                      }
- 207   4                                      
- 208   4                                      if(SYS_Time.GHour==6)SYS_STEP++;// Ê±¼äµ½×ªµ½ÏÂÒ»²½                             
- 209   4                                      break;
- 210   4                              }
- 211   3                              case 2://µÚÒ»½×¶Î 6 ~ 9Ð¡Ê± 
- 212   3                              {
- 213   4                                      if(Current_Time<30)//30Ãë2.5V
- 214   4                                      {
- 215   5                                              PWM0_set (0,CurrentBase[SYS_STEP]);
- 216   5                                              
- 217   5                                      }
- 218   4                                      else if(Current_Time<35)
- 219   4                                              {
- 220   5                                                      PWM0_set (0,0x33);//5Ãë1V
- 221   5                                              }
- 222   4                                              else
- 223   4                                              {
- 224   5                                                      Current_Time = 0;
- 225   5                                              }
- 226   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
- 227   4                                      if(Change_Num==0)//±ÜÃâºÍÓÃ»§µ÷½ÚÊÇµÄÖ¸Ê¾µÆ»¥Ïà¸ÉÈÅ
- 228   4                                      {
- 229   5                                              Led1 = 0;
- 230   5                                              Led2 = 1;
- 231   5                                              Led3 = 0;
- 232   5                                      }
- 233   4                                      if(SYS_Time.GHour==9)SYS_STEP++;
- 234   4                                      break;
- 235   4                              }                       
- 236   3                              case 3://µÚÒ»½×¶Î 9 ~ 12Ð¡Ê± 
- 237   3                              {
- 238   4                                      if(Current_Time<30)//30Ãë2.5V
- 239   4                                      {
- 240   5                                              PWM0_set (0,CurrentBase[SYS_STEP]);
-C51 COMPILER V9.00   MAIN                                                                  06/20/2015 22:18:00 PAGE 5   
+ 176   1              Delay_nms(1000);
+ 177   1              while(1)
+ 178   1              {
+ 179   2      //              EA = 1;
+ 180   2      //              TR0 = 1;
+ 181   2                      AD0 = Get_ad_result(2);         
+ 182   2                      AD = Get_ad_result(3);
+ 183   2                      UserData_Claculite();
+ 184   2                      if(Change_Num) Current_Time = 0;//´Ë¾äÊÇÎªÁËÔÚÐÞÕýÊÇÊý¾ÝÊä³ö¿Ú²»·´×ªÓÃµÄ
+ 185   2                      switch(SYS_STEP)// Õû¸öÏµÍ³Ö´ÐÐÁ÷³Ì
+ 186   2                      {
+ 187   3                              case 1://µÚÒ»½×¶Î 0 ~ 6Ð¡Ê± 
+ 188   3                              {
+ 189   4                                      
+ 190   4                                      if(Current_Time<30)//30Ãë2.5V
+ 191   4                                      {
+ 192   5                                              PWM0_set (0,CurrentBase[SYS_STEP]);
+ 193   5                                              
+ 194   5                                      }
+ 195   4                                      else if(Current_Time<35)
+ 196   4                                              {
+ 197   5                                                      PWM0_set (0,0x33);//5Ãë1V
+ 198   5                                              }
+ 199   4                                              else
+ 200   4                                              {
+ 201   5                                                      Current_Time = 0;
+ 202   5                                              }
+ 203   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
+ 204   4                                      if(Change_Num==0)//±ÜÃâºÍÓÃ»§µ÷½ÚÊÇµÄÖ¸Ê¾µÆ»¥Ïà¸ÉÈÅ
+ 205   4                                      {
+ 206   5                                              Led1 = 1;
+ 207   5                                              Led2 = 0;
+ 208   5                                              Led3 = 0;
+ 209   5                                      }
+ 210   4                                      
+ 211   4                                      if(SYS_Time.GHour==6)SYS_STEP++;// Ê±¼äµ½×ªµ½ÏÂÒ»²½                             
+ 212   4                                      break;
+ 213   4                              }
+ 214   3                              case 2://µÚÒ»½×¶Î 6 ~ 9Ð¡Ê± 
+ 215   3                              {
+ 216   4                                      if(Current_Time<30)//30Ãë2.5V
+ 217   4                                      {
+ 218   5                                              PWM0_set (0,CurrentBase[SYS_STEP]);
+ 219   5                                              
+ 220   5                                      }
+ 221   4                                      else if(Current_Time<35)
+ 222   4                                              {
+ 223   5                                                      PWM0_set (0,0x33);//5Ãë1V
+ 224   5                                              }
+ 225   4                                              else
+ 226   4                                              {
+ 227   5                                                      Current_Time = 0;
+ 228   5                                              }
+ 229   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
+ 230   4                                      if(Change_Num==0)//±ÜÃâºÍÓÃ»§µ÷½ÚÊÇµÄÖ¸Ê¾µÆ»¥Ïà¸ÉÈÅ
+ 231   4                                      {
+ 232   5                                              Led1 = 0;
+ 233   5                                              Led2 = 1;
+ 234   5                                              Led3 = 0;
+ 235   5                                      }
+ 236   4                                      if(SYS_Time.GHour==9)SYS_STEP++;
+ 237   4                                      break;
+C51 COMPILER V9.00   MAIN                                                                  06/23/2015 07:53:34 PAGE 5   
 
- 241   5                                              
- 242   5                                      }
- 243   4                                      else if(Current_Time<35)
- 244   4                                              {
- 245   5                                                      PWM0_set (0,0x19);//5Ãë0.5V
- 246   5                                              }
- 247   4                                              else
- 248   4                                              {
- 249   5                                                      Current_Time = 0;
- 250   5                                              }
- 251   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
- 252   4                                      if(Change_Num==0)//±ÜÃâºÍÓÃ»§µ÷½ÚÊÇµÄÖ¸Ê¾µÆ»¥Ïà¸ÉÈÅ
- 253   4                                      {
- 254   5                                              Led1 = 0;
- 255   5                                              Led2 = 0;
- 256   5                                              Led3 = 1;
- 257   5                                      }
- 258   4                                      if(SYS_Time.GHour==12)SYS_STEP++;// Ê±¼äµ½×ªµ½ÏÂÒ»²½    
- 259   4                                      break;
- 260   4                              }
- 261   3                              case 4://µÚÒ»½×¶Î 12 ~ 14Ð¡Ê± 
- 262   3                              {
- 263   4                                      PWM0_set (0,CurrentBase[SYS_STEP]);
- 264   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
- 265   4                                      if(Change_Num==0)//±ÜÃâºÍÓÃ»§µ÷½ÚÊÇµÄÖ¸Ê¾µÆ»¥Ïà¸ÉÈÅ
- 266   4                                      {
- 267   5                                              Led1 = 0;
- 268   5                                              Led2 = 0;
- 269   5                                              Led3 = 0;
- 270   5                                      }
- 271   4                                      if(SYS_Time.GHour==14)SYS_STEP++;// Ê±¼äµ½×ªµ½ÏÂÒ»²½    
- 272   4                                      break;
- 273   4                              }
- 274   3                              case 5://³äÂú
- 275   3                              {
- 276   4                                      PWM0_set (0,CurrentBase[0]);
- 277   4                                      PWM0_set (1,VoltageBase[0]);
- 278   4                                      if(Change_Num==0)//±ÜÃâºÍÓÃ»§µ÷½ÚÊÇµÄÖ¸Ê¾µÆ»¥Ïà¸ÉÈÅ
- 279   4                                      {
- 280   5                                              Led1 = 0;
- 281   5                                              Led2 = 0;
- 282   5                                              Led3 = 0;
- 283   5                                      }
- 284   4      //                              SYS_STEP = 1;
- 285   4                                      break;
- 286   4                              }
- 287   3                      }
- 288   2                      switch(Change_Num)
- 289   2                      {
- 290   3                              case 1:LedShanShuo1();break;
- 291   3                              case 2:LedShanShuo2();break;
- 292   3                              case 3:LedShanShuo3();break;
- 293   3                              case 0:  break;
- 294   3                      }
- 295   2                      if(Save_Flag == 1)
- 296   2                      {
- 297   3                              Save_Flag = 0;
- 298   3                              UserData_Init0();
- 299   3                              LedShanShuo();
- 300   3                      }
- 301   2                                      
- 302   2                      Delay_nms(10);
-C51 COMPILER V9.00   MAIN                                                                  06/20/2015 22:18:00 PAGE 6   
+ 238   4                              }                       
+ 239   3                              case 3://µÚÒ»½×¶Î 9 ~ 12Ð¡Ê± 
+ 240   3                              {
+ 241   4                                      if(Current_Time<30)//30Ãë2.5V
+ 242   4                                      {
+ 243   5                                              PWM0_set (0,CurrentBase[SYS_STEP]);
+ 244   5                                              
+ 245   5                                      }
+ 246   4                                      else if(Current_Time<35)
+ 247   4                                              {
+ 248   5                                                      PWM0_set (0,0x19);//5Ãë0.5V
+ 249   5                                              }
+ 250   4                                              else
+ 251   4                                              {
+ 252   5                                                      Current_Time = 0;
+ 253   5                                              }
+ 254   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
+ 255   4                                      if(Change_Num==0)//±ÜÃâºÍÓÃ»§µ÷½ÚÊÇµÄÖ¸Ê¾µÆ»¥Ïà¸ÉÈÅ
+ 256   4                                      {
+ 257   5                                              Led1 = 0;
+ 258   5                                              Led2 = 0;
+ 259   5                                              Led3 = 1;
+ 260   5                                      }
+ 261   4                                      if(SYS_Time.GHour==12)SYS_STEP++;// Ê±¼äµ½×ªµ½ÏÂÒ»²½    
+ 262   4                                      break;
+ 263   4                              }
+ 264   3                              case 4://µÚÒ»½×¶Î 12 ~ 14Ð¡Ê± 
+ 265   3                              {
+ 266   4                                      PWM0_set (0,CurrentBase[SYS_STEP]);
+ 267   4                                      PWM0_set (1,VoltageBase[SYS_STEP]);
+ 268   4                                      if(Change_Num==0)//±ÜÃâºÍÓÃ»§µ÷½ÚÊÇµÄÖ¸Ê¾µÆ»¥Ïà¸ÉÈÅ
+ 269   4                                      {
+ 270   5                                              Led1 = 0;
+ 271   5                                              Led2 = 0;
+ 272   5                                              Led3 = 0;
+ 273   5                                      }
+ 274   4                                      if(SYS_Time.GHour==14)SYS_STEP++;// Ê±¼äµ½×ªµ½ÏÂÒ»²½    
+ 275   4                                      break;
+ 276   4                              }
+ 277   3                              case 5://³äÂú
+ 278   3                              {
+ 279   4                                      PWM0_set (0,CurrentBase[0]);
+ 280   4                                      PWM0_set (1,VoltageBase[0]);
+ 281   4                                      if(Change_Num==0)//±ÜÃâºÍÓÃ»§µ÷½ÚÊÇµÄÖ¸Ê¾µÆ»¥Ïà¸ÉÈÅ
+ 282   4                                      {
+ 283   5                                              Led1 = 0;
+ 284   5                                              Led2 = 0;
+ 285   5                                              Led3 = 0;
+ 286   5                                      }
+ 287   4      //                              SYS_STEP = 1;
+ 288   4                                      break;
+ 289   4                              }
+ 290   3                      }
+ 291   2                      switch(Change_Num)
+ 292   2                      {
+ 293   3                              case 1:LedShanShuo1();break;
+ 294   3                              case 2:LedShanShuo2();break;
+ 295   3                              case 3:LedShanShuo3();break;
+ 296   3                              case 0:  break;
+ 297   3                      }
+ 298   2                      if(Save_Flag == 1)
+ 299   2                      {
+C51 COMPILER V9.00   MAIN                                                                  06/23/2015 07:53:34 PAGE 6   
 
- 303   2                      
- 304   2              }
- 305   1      
- 306   1      }
- 307          //-----------------------------------------------
- 308          
- 309          /* Timer0 interrupt routine */
- 310          void tm0_isr() interrupt 1 using 1
- 311          {
- 312   1              TL0 = T0MS;                     //³õÊ¼»¯¼ÆÊ±Öµ
- 313   1          TH0 = T0MS >> 8;
- 314   1              Time_Base++;
- 315   1              if(Time_Base>=100)
- 316   1              {
- 317   2                      Time_Base = 0;
- 318   2                      Current_Time++;//ÓÃÓÚÊä³ö¿Ú1 30ÃëºÍ5ÃëÖØ¸´ÓÃ
- 319   2                      SYS_Time.GSeconds++;
- 320   2                      if(SYS_Time.GSeconds>59) 
- 321   2                      {
- 322   3                              SYS_Time.GSeconds=0;
- 323   3                              SYS_Time.GMintes++;
- 324   3                      }
- 325   2                      if(SYS_Time.GMintes>59) 
- 326   2                      {
- 327   3                              SYS_Time.GMintes=0;
- 328   3                              SYS_Time.GHour++;
- 329   3                      }
- 330   2                      if(SYS_Time.GHour>23) 
- 331   2                      {
- 332   3                              SYS_Time.GHour=0;
- 333   3                      }
- 334   2      
- 335   2              }
- 336   1              if(Wait_Flag)time_wait++;//Ö´ÐÐÖÜÆÚÎª10ms       
- 337   1              user_app();                      
- 338   1      }
- 339          /*----------------------------
- 340          UART interrupt service routine
- 341          ----------------------------*/
- 342          void Uart_Isr() interrupt 4 using 1
- 343          {
- 344   1          if (RI)
- 345   1          {
- 346   2              RI = 0;             //Clear receive interrupt flag
- 347   2              DA = SBUF; 
- 348   2      //              SendData(DA);
- 349   2      //              PWM0_set (0,DA);
- 350   2      //              PWM0_set (1,DA); 
- 351   2                      if(DA == 0xaa)
- 352   2                      {
- 353   3                              IapEraseSector(0x0000);//²Á³öµÚÒ»¸öÉÈÇø
- 354   3                              IapEraseSector(0x0200);//²Á³öµÚ¶þ¸öÉÈÇø
- 355   3                      }
- 356   2                      if(DA == 1)
- 357   2                      {
- 358   3                              SendData(CurrentBase[SYS_STEP]);
- 359   3                              SendData(VoltageBase[SYS_STEP]);
- 360   3                              SendData(CurrentInput[SYS_STEP]>>8);
- 361   3                              SendData(CurrentInput[SYS_STEP]&0xff);
- 362   3                      }
- 363   2                      if(DA == 2)
- 364   2                      {
-C51 COMPILER V9.00   MAIN                                                                  06/20/2015 22:18:00 PAGE 7   
+ 300   3                              Save_Flag = 0;
+ 301   3                              UserData_Init0();
+ 302   3                              LedShanShuo();
+ 303   3                      }
+ 304   2                      
+ 305   2                      
+ 306   2              }
+ 307   1      
+ 308   1      }
+ 309          //-----------------------------------------------
+ 310          
+ 311          /* Timer0 interrupt routine */
+ 312          void tm0_isr() interrupt 1 using 1
+ 313          {
+ 314   1              TL0 = T0MS;                     //³õÊ¼»¯¼ÆÊ±Öµ
+ 315   1          TH0 = T0MS >> 8;
+ 316   1              Time_Base++;
+ 317   1              if(Time_Base>=100)
+ 318   1              {
+ 319   2                      Time_Base = 0;
+ 320   2                      Current_Time++;//ÓÃÓÚÊä³ö¿Ú1 30ÃëºÍ5ÃëÖØ¸´ÓÃ
+ 321   2                      SYS_Time.GSeconds++;
+ 322   2                      if(SYS_Time.GSeconds>59) 
+ 323   2                      {
+ 324   3                              SYS_Time.GSeconds=0;
+ 325   3                              SYS_Time.GMintes++;
+ 326   3                      }
+ 327   2                      if(SYS_Time.GMintes>59) 
+ 328   2                      {
+ 329   3                              SYS_Time.GMintes=0;
+ 330   3                              SYS_Time.GHour++;
+ 331   3                      }
+ 332   2                      if(SYS_Time.GHour>23) 
+ 333   2                      {
+ 334   3                              SYS_Time.GHour=0;
+ 335   3                      }
+ 336   2      
+ 337   2              }
+ 338   1              if(Wait_Flag)time_wait++;//Ö´ÐÐÖÜÆÚÎª10ms       
+ 339   1              user_app();                      
+ 340   1      }
+ 341          /*----------------------------
+ 342          UART interrupt service routine
+ 343          ----------------------------*/
+ 344          void Uart_Isr() interrupt 4 using 1
+ 345          {
+ 346   1          if (RI)
+ 347   1          {
+ 348   2              RI = 0;             //Clear receive interrupt flag
+ 349   2              DA = SBUF; 
+ 350   2      //              SendData(DA);
+ 351   2      //              PWM0_set (0,DA);
+ 352   2      //              PWM0_set (1,DA); 
+ 353   2                      if(DA == 0xaa)
+ 354   2                      {
+ 355   3                              IapEraseSector(0x0000);//²Á³öµÚÒ»¸öÉÈÇø
+ 356   3                              IapEraseSector(0x0200);//²Á³öµÚ¶þ¸öÉÈÇø
+ 357   3                      }
+ 358   2                      if(DA == 1)
+ 359   2                      {
+ 360   3                              SendData(CurrentBase[SYS_STEP]);
+ 361   3                              SendData(VoltageBase[SYS_STEP]);
+C51 COMPILER V9.00   MAIN                                                                  06/23/2015 07:53:34 PAGE 7   
 
- 365   3                              SendData(AD>>8);
- 366   3                              SendData(AD);
- 367   3                      }
- 368   2                      if(DA == 3)
- 369   2                      {
- 370   3                              SendData(SYS_Time.GHour);
- 371   3                              SendData(SYS_Time.GMintes);
- 372   3                              SendData(SYS_Time.GSeconds);
- 373   3                      }
- 374   2          }
- 375   1      }
- 376           WORD Get_SYSTime()
- 377          {
- 378   1              return Time_Base;
- 379   1      }
+ 362   3                              SendData(CurrentInput[SYS_STEP]>>8);
+ 363   3                              SendData(CurrentInput[SYS_STEP]&0xff);
+ 364   3                      }
+ 365   2                      if(DA == 2)
+ 366   2                      {
+ 367   3                              SendData(2);
+ 368   3                              SendData(AD0>>8);
+ 369   3                              SendData(AD0);
+ 370   3                              SendData(3);
+ 371   3                              SendData(AD>>8);
+ 372   3                              SendData(AD);
+ 373   3                      
+ 374   3                      }
+ 375   2                      if(DA == 3)
+ 376   2                      {
+ 377   3                              SendData(SYS_Time.GHour);
+ 378   3                              SendData(SYS_Time.GMintes);
+ 379   3                              SendData(SYS_Time.GSeconds);
+ 380   3                      }
+ 381   2                      if(DA == 0x12)
+ 382   2                      {
+ 383   3                              SYS_Time.GHour = 5;
+ 384   3                              SYS_Time.GMintes = 59;
+ 385   3                              SYS_Time.GSeconds = 40;
+ 386   3                              SendData(SYS_Time.GHour);
+ 387   3                              SendData(SYS_Time.GMintes);
+ 388   3                              SendData(SYS_Time.GSeconds);
+ 389   3                      }
+ 390   2                      if(DA == 0x23)
+ 391   2                      {
+ 392   3                              SYS_Time.GHour = 8;
+ 393   3                              SYS_Time.GMintes = 59;
+ 394   3                              SYS_Time.GSeconds = 40;
+ 395   3                              SendData(SYS_Time.GHour);
+ 396   3                              SendData(SYS_Time.GMintes);
+ 397   3                              SendData(SYS_Time.GSeconds);
+ 398   3                      }
+ 399   2                      if(DA == 0x34)
+ 400   2                      {
+ 401   3                              SYS_Time.GHour = 11;
+ 402   3                              SYS_Time.GMintes = 59;
+ 403   3                              SYS_Time.GSeconds = 40;
+ 404   3                              SendData(SYS_Time.GHour);
+ 405   3                              SendData(SYS_Time.GMintes);
+ 406   3                              SendData(SYS_Time.GSeconds);
+ 407   3                      }
+ 408   2                      if(DA == 0x45)
+ 409   2                      {
+ 410   3                              SYS_Time.GHour = 13;
+ 411   3                              SYS_Time.GMintes = 59;
+ 412   3                              SYS_Time.GSeconds = 40;
+ 413   3                              SendData(SYS_Time.GHour);
+ 414   3                              SendData(SYS_Time.GMintes);
+ 415   3                              SendData(SYS_Time.GSeconds);
+ 416   3                      }
+ 417   2          }
+ 418   1      }
+ 419           WORD Get_SYSTime()
+ 420          {
+ 421   1              return Time_Base;
+ 422   1      }
+
+C51 COMPILER V9.00   MAIN                                                                  06/23/2015 07:53:34 PAGE 8   
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    989    ----
+   CODE SIZE        =   1180    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

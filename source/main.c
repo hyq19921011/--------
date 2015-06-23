@@ -1,10 +1,10 @@
 
-/***************
+/**********************************************************
 项目名称：电动车充电器控制器
 功能：	  根据电池电量的不同合理控制充电电流，保护电池寿命。
 作者：	  河南科技大学----黄永全
 日期：    2015/06/04
-**************/
+**********************************************************/
 /**************头文件**************/
 #include <STC15F2K60S2.H>
 #include "main.h"
@@ -56,7 +56,10 @@ void user_app()//用户程序
 			{
 				SYS_STEP = 1;
 			}
-				
+			if(SYS_STEP == 1){SYS_Time.GHour = 0;SYS_Time.GMintes = 0;SYS_Time.GSeconds = 0;}
+			if(SYS_STEP == 2){SYS_Time.GHour = 6;SYS_Time.GMintes = 0;SYS_Time.GSeconds = 0;}//将时间设置到第二阶段的时间6~9小时 
+			if(SYS_STEP == 3){SYS_Time.GHour = 9;SYS_Time.GMintes = 0;SYS_Time.GSeconds = 0;}//将时间设置到第二阶段的时间6~9小时 
+			if(SYS_STEP == 4){SYS_Time.GHour = 12;SYS_Time.GMintes = 0;SYS_Time.GSeconds = 0;}//将时间设置到第二阶段的时间6~9小时 	
 		}
 		if((*pKeyValue==3)&&(key_stateValue == return_keyPressed) )//参数选择按键
 		{
@@ -151,7 +154,7 @@ void UserData_Claculite()//用户数据分析，判断该执行第几步
 	if(AD0 <= 615)//如果电流输入信号低于3V暂停计时 0x0267
 	{
 		Delay_nms(100);
-		while(Get_ad_result(5)<=0x2c)
+		while(Get_ad_result(2)<=615)
 		{
 			TR0 = 0;//暂停计时器
 			LedShanShuo();
@@ -168,15 +171,15 @@ void main()
 	Timer0Init();
 	AD_init();
 	PWMn_init();
-    while(UserData_Init()) LedShanShuo();
+    while(UserData_Init0()) LedShanShuo();
 	EA = 1;
 	Delay_nms(1000);
 	while(1)
 	{
 //		EA = 1;
 //		TR0 = 1;
-		AD = Get_ad_result(5);
-		AD0 = Get_ad_result(2);
+		AD0 = Get_ad_result(2);		
+		AD = Get_ad_result(3);
 		UserData_Claculite();
 		if(Change_Num) Current_Time = 0;//此句是为了在修正是数据输出口不反转用的
 		switch(SYS_STEP)// 整个系统执行流程
@@ -298,8 +301,7 @@ void main()
 			UserData_Init0();
 			LedShanShuo();
 		}
- 				
-		Delay_nms(10);
+ 		
 		
 	}
 
@@ -362,11 +364,52 @@ void Uart_Isr() interrupt 4 using 1
 		}
 		if(DA == 2)
 		{
+			SendData(2);
+			SendData(AD0>>8);
+			SendData(AD0);
+			SendData(3);
 			SendData(AD>>8);
 			SendData(AD);
+		
 		}
 		if(DA == 3)
 		{
+			SendData(SYS_Time.GHour);
+			SendData(SYS_Time.GMintes);
+			SendData(SYS_Time.GSeconds);
+		}
+		if(DA == 0x12)
+		{
+			SYS_Time.GHour = 5;
+			SYS_Time.GMintes = 59;
+			SYS_Time.GSeconds = 40;
+			SendData(SYS_Time.GHour);
+			SendData(SYS_Time.GMintes);
+			SendData(SYS_Time.GSeconds);
+		}
+		if(DA == 0x23)
+		{
+			SYS_Time.GHour = 8;
+			SYS_Time.GMintes = 59;
+			SYS_Time.GSeconds = 40;
+			SendData(SYS_Time.GHour);
+			SendData(SYS_Time.GMintes);
+			SendData(SYS_Time.GSeconds);
+		}
+		if(DA == 0x34)
+		{
+			SYS_Time.GHour = 11;
+			SYS_Time.GMintes = 59;
+			SYS_Time.GSeconds = 40;
+			SendData(SYS_Time.GHour);
+			SendData(SYS_Time.GMintes);
+			SendData(SYS_Time.GSeconds);
+		}
+		if(DA == 0x45)
+		{
+			SYS_Time.GHour = 13;
+			SYS_Time.GMintes = 59;
+			SYS_Time.GSeconds = 40;
 			SendData(SYS_Time.GHour);
 			SendData(SYS_Time.GMintes);
 			SendData(SYS_Time.GSeconds);

@@ -1,4 +1,4 @@
-C51 COMPILER V9.00   ADC                                                                   06/20/2015 21:56:27 PAGE 1   
+C51 COMPILER V9.00   ADC                                                                   06/22/2015 22:52:31 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE ADC
@@ -23,55 +23,54 @@ line level    source
   13          
   14          void AD_init()//10Î»
   15          {
-  16   1              P1ASF|=0x24;       //½«P1^5¿ÚºÍ1^2×÷ÎªADC¹¦ÄÜÊ¹ÓÃ
-  17   1              AUXR1|=0x04;      //0000,0100 Áî ADRJ=1£¬10Î»A/D×ª»»½á¹ûµÄ¸ß2Î»´æ·ÅÔÚADC_RESµÄµÍ2Î»ÖÐ£¬µÍ8Î»´æ·ÅÔÚADC_RES
-             -LÖÐ
-  18   1              ADC_CONTR = 0xE0; //1110,0000 Áî ADC_POWER=1£¬½«ADCµçÔ´´ò¿ª£¬ SPEED1£¬SPEED0£ºÄ£Êý×ª»»Æ÷×ª»»ËÙ¶È¿ØÖÆÎ»
+  16   1              P1ASF|=0x0c;       //½«P1^2¿ÚºÍ1^3×÷ÎªADC¹¦ÄÜÊ¹ÓÃ
+  17   1              CLK_DIV&=~0x20;      //0000,0100 Áî ADRJ=1£¬10Î»A/D×ª»»½á¹ûµÄ¸ß2Î»´æ·ÅÔÚADC_RESµÄµÍ2Î»ÖÐ£¬µÍ8Î»´æ·ÅÔÚADC_
+             -RESLÖÐ
+  18   1              ADC_CONTR = ADC_POWER | ADC_SPEEDH; //1110,0000 Áî ADC_POWER=1£¬½«ADCµçÔ´´ò¿ª£¬ SPEED1£¬SPEED0£ºÄ£Êý×ª»»Æ
+             -÷×ª»»ËÙ¶È¿ØÖÆÎ»
   19   1              
   20   1              ADC_RES=0;     //¸ß°ËÎ»Êý¾ÝÇåÁã,STC12C5A60S2 ADÊý¾Ý¼Ä´æÃûÓëSTC12C54¡Á¡ÁÏµÁÐ²»Í¬
   21   1              ADC_RESL=0;    //µÍÁ½Î»ÇåÁã
   22   1              AD_delay(2);      //Ê¹ÊäÈëµçÑ¹´ïµ½ÎÈ¶¨
-  23   1              Get_ad_result0(5);
-  24   1              Get_ad_result0(5);
-  25   1              Get_ad_result0(5);
-  26   1      }
-  27          
-  28          WORD Get_ad_result(BYTE channel)
-  29          {
-  30   1              BYTE i;
-  31   1              WORD ad_result=0,total=0;
-  32   1              for(i=0;i<ADC_TIMES;i++)
-  33   1              {
-  34   2                      ADC_CONTR |= ADC_POWER | ADC_SPEEDLL | channel | ADC_START;   //0000,1xxx Áî ADC_START=1, Æô¶¯A/D ×ª»» ;
-             -Ñ¡ÔñÄ£ÄâÐÅºÅÊäÈëIOÍ¨µÀ
-  35   2                      AD_delay(8);  //Ê¹ÊäÈëµçÑ¹´ïµ½ÎÈ¶¨
-  36   2                      while( !(ADC_FLAG & ADC_CONTR) );  //0001,0000, ADC_FLAG ==1²âÊÔA/D×ª»»½áÊø·ñ
-  37   2                      ADC_CONTR &= ~ADC_FLAG;  //1110,0111 Áî ADC_FLAG=0,Çå³þAD×ª»»½áÊø±êÖ¾;Áî ADC_START=0, ¹Ø±ÕA/D ×ª»»,
-  38   2                      ad_result=ADC_RES<<2|ADC_RESL;  //¸ßÁ½Î»ÓëµÍÎ»Êý¾Ý ½áºÏ  ( 0~1023)
-  39   2                      total += ad_result;
-  40   2              }
-  41   1              total=total>>3;
-  42   1              return total;  // ·µ»Ø A/D ×ª»»½á¹û
-  43   1      }
-  44          WORD Get_ad_result0(BYTE channel)
-  45          {
-  46   1              u16 ad_result = 0;
-  47   1              
-  48   1                      ADC_CONTR |= ADC_POWER | ADC_SPEEDLL | channel | ADC_START;   //0000,1xxx Áî ADC_START=1, Æô¶¯A/D ×ª»» ;
-             -Ñ¡ÔñÄ£ÄâÐÅºÅÊäÈëIOÍ¨µÀ
-  49   1                      AD_delay(4);  //Ê¹ÊäÈëµçÑ¹´ïµ½ÎÈ¶¨
-  50   1                      while( !(ADC_FLAG & ADC_CONTR) );  //0001,0000, ADC_FLAG ==1²âÊÔA/D×ª»»½áÊø·ñ
-  51   1                      ADC_CONTR &= ~ADC_FLAG;  //1110,0111 Áî ADC_FLAG=0,Çå³þAD×ª»»½áÊø±êÖ¾;Áî ADC_START=0, ¹Ø±ÕA/D ×ª»»,
-C51 COMPILER V9.00   ADC                                                                   06/20/2015 21:56:27 PAGE 2   
+  23   1      }
+  24          
+  25          WORD Get_ad_result(BYTE channel)
+  26          {
+  27   1              BYTE i;
+  28   1              WORD ad_result=0,total=0;
+  29   1              AD_init();
+  30   1              for(i=0;i<ADC_TIMES;i++)
+  31   1              {
+  32   2                      ADC_CONTR |= ADC_POWER | ADC_SPEEDH | channel | ADC_START;   //0000,1xxx Áî ADC_START=1, Æô¶¯A/D ×ª»» ;Ñ
+             -¡ÔñÄ£ÄâÐÅºÅÊäÈëIOÍ¨µÀ
+  33   2                      AD_delay(8);  //Ê¹ÊäÈëµçÑ¹´ïµ½ÎÈ¶¨
+  34   2                      while( !(ADC_FLAG & ADC_CONTR) );  //0001,0000, ADC_FLAG ==1²âÊÔA/D×ª»»½áÊø·ñ
+  35   2                      ADC_CONTR &= ~ADC_FLAG;  //1110,0111 Áî ADC_FLAG=0,Çå³þAD×ª»»½áÊø±êÖ¾;Áî ADC_START=0, ¹Ø±ÕA/D ×ª»»,
+  36   2                      ad_result=ADC_RES<<2|ADC_RESL;  //¸ßÁ½Î»ÓëµÍÎ»Êý¾Ý ½áºÏ  ( 0~1023)
+  37   2                      total += ad_result;
+  38   2              }
+  39   1              total=total>>3;
+  40   1              return total;  // ·µ»Ø A/D ×ª»»½á¹û
+  41   1      }
+  42          WORD Get_ad_result0(BYTE channel)
+  43          {
+  44   1              u16 ad_result = 0;
+  45   1              
+  46   1                      ADC_CONTR |= ADC_POWER | ADC_SPEEDH | channel | ADC_START;   //0000,1xxx Áî ADC_START=1, Æô¶¯A/D ×ª»» ;Ñ
+             -¡ÔñÄ£ÄâÐÅºÅÊäÈëIOÍ¨µÀ
+  47   1                      AD_delay(4);  //Ê¹ÊäÈëµçÑ¹´ïµ½ÎÈ¶¨
+  48   1                      while( !(ADC_FLAG & ADC_CONTR) );  //0001,0000, ADC_FLAG ==1²âÊÔA/D×ª»»½áÊø·ñ
+  49   1                      ADC_CONTR &= ~ADC_FLAG;  //1110,0111 Áî ADC_FLAG=0,Çå³þAD×ª»»½áÊø±êÖ¾;Áî ADC_START=0, ¹Ø±ÕA/D ×ª»»,
+  50   1                      ad_result=ADC_RES<<2|ADC_RESL;  //¸ßÁ½Î»ÓëµÍÎ»Êý¾Ý ½áºÏ  ( 0~1023)
+C51 COMPILER V9.00   ADC                                                                   06/22/2015 22:52:31 PAGE 2   
 
-  52   1                      ad_result=ADC_RES<<2|ADC_RESL;  //¸ßÁ½Î»ÓëµÍÎ»Êý¾Ý ½áºÏ  ( 0~1023)
-  53   1      
-  54   1              return ad_result;  // ·µ»Ø A/D ×ª»»½á¹û
-  55   1      }
+  51   1      
+  52   1              return ad_result;  // ·µ»Ø A/D ×ª»»½á¹û
+  53   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    179    ----
+   CODE SIZE        =    168    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
