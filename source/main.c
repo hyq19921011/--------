@@ -24,14 +24,10 @@ SYSTime SYS_Time;  //ÏµÍ³Ê±ÖÓ
 BYTE SYS_STEP = 1; //ÏµÍ³Ö´ĞĞµÄ²½Öè
 u16 AD_Time = 0;
 u16 AD = 1023;    //²É¼¯»ØÀ´µÄADÖµ
-u16 AD0 = 1023;   //Òì³£Çé¿ö²É¼¯
 BYTE DA = 10;      
-//BYTE CurrentBase[6] = {0x00,0x80,0x67,0x33,0x19,0};//0\2.5\2.0\1.0\0.5 µçÁ÷»ù×¼
-//BYTE VoltageBase[6] = {0x00,0x9a,0xce,0xce,0xb4,0};//0\3\4\4\3.5       µçÑ¹»ù×¼
-//WORD CurrentInput[6] = {0x00,0x019f,0x00d1,0x006a,0,0};//0\2\1\0.5\      µçÁ÷ÊäÈëĞÅºÅ
-BYTE CurrentBase[6] = {0x00,0x9a,0x80,0x4d,0x19,0};//0\3\2.5\1.5\1 µçÁ÷»ù×¼
-BYTE VoltageBase[6] = {0x00,0xb8,0xce,0xce,0xb8,0};//0\3.6\4\4\3.6       µçÑ¹»ù×¼
-WORD CurrentInput[6] = {0x00,0x0200,0x010a,0x00d1,0,0};//0\2.5\1.3\1.0\   µçÁ÷ÊäÈëĞÅºÅ
+BYTE CurrentBase[6] = {0x00,0x80,0x67,0x33,0x19,0};//0\2.5\2.0\1.0\0.5 µçÁ÷»ù×¼
+BYTE VoltageBase[6] = {0x00,0x9a,0xce,0xce,0xb4,0};//0\3\4\4\3.5       µçÑ¹»ù×¼
+WORD CurrentInput[6] = {0x00,0x019f,0x00d1,0x006a,0,0};//0\2\1\0.5\      µçÁ÷ÊäÈëĞÅºÅ
 BYTE Current_Base = 0;
 BYTE Voltage_Base = 0;
 BYTE Change_Num = 0; //Ñ¡Ôñ²ÎÊıÏî
@@ -47,8 +43,8 @@ void user_app()//ÓÃ»§³ÌĞò
     u8* pKeyValue;  
     *pKeyValue=0;  
     key_stateValue=read_key(pKeyValue); 
-//	if(Key_Lock==1)//Ëø¶¨¼ü£¬Îª1½â³ıËø¶¨£¬Îª0Ëø¶¨
-//	{
+	if(Key_Lock==1)//Ëø¶¨¼ü£¬Îª1½â³ıËø¶¨£¬Îª0Ëø¶¨
+	{
 		if((*pKeyValue==4)&&(key_stateValue == return_keyPressed) )//µ÷ÊÔ°´¼ü
 		{
 			SYS_STEP++;
@@ -102,7 +98,7 @@ void user_app()//ÓÃ»§³ÌĞò
 			}
 
 		}
-//	}
+	}
 	
 	
 	
@@ -112,18 +108,18 @@ void UserData_Claculite()//ÓÃ»§Êı¾İ·ÖÎö£¬ÅĞ¶Ï¸ÃÖ´ĞĞµÚ¼¸²½
 	
 	if( (AD<= CurrentInput[SYS_STEP])&&(SYS_STEP < 4))//Èç¹ûµçÁ÷ÊäÈëĞÅºÅµÍÓÚ2.0V²¢ÇÒ³¬¹ı10S,Ç°3²½Ö´ĞĞ£¬
 	{
-//		if(AD <= 0x2c)//Èç¹ûµçÁ÷ÊäÈëĞÅºÅµÍÓÚ0.2VÔİÍ£¼ÆÊ±
-//		{
-//			Delay_nms(100);
-//			while(Get_ad_result(5)<=0x2c)
-//			{
-//				TR0 = 0;//ÔİÍ£¼ÆÊ±Æ÷
-//				LedShanShuo();
-//			}
-//			TR0 = 1;//´ò¿ª¼ÆÊ±Æ÷
-//		}
-//		else
-//		{
+		if(AD <= 0x2c)//Èç¹ûµçÁ÷ÊäÈëĞÅºÅµÍÓÚ0.2VÔİÍ£¼ÆÊ±
+		{
+			Delay_nms(100);
+			while(Get_ad_result(5)<=0x2c)
+			{
+				TR0 = 0;//ÔİÍ£¼ÆÊ±Æ÷
+				LedShanShuo();
+			}
+			TR0 = 1;//´ò¿ª¼ÆÊ±Æ÷
+		}
+		else
+		{
 			Wait_Flag = 1;
 			if(time_wait>=1000)//³¬¹ı10S
 			{		
@@ -140,7 +136,7 @@ void UserData_Claculite()//ÓÃ»§Êı¾İ·ÖÎö£¬ÅĞ¶Ï¸ÃÖ´ĞĞµÚ¼¸²½
 				Led0 = 1;
 				
 			}
-//		}
+		}
 		
 							
 	}
@@ -151,6 +147,7 @@ void UserData_Claculite()//ÓÃ»§Êı¾İ·ÖÎö£¬ÅĞ¶Ï¸ÃÖ´ĞĞµÚ¼¸²½
 		Led0 = 0;
 	}
 
+<<<<<<< HEAD
 	if(AD0 <= 615)//Èç¹ûµçÁ÷ÊäÈëĞÅºÅµÍÓÚ3VÔİÍ£¼ÆÊ± 0x0267
 	{
 		Delay_nms(100);
@@ -161,6 +158,9 @@ void UserData_Claculite()//ÓÃ»§Êı¾İ·ÖÎö£¬ÅĞ¶Ï¸ÃÖ´ĞĞµÚ¼¸²½
 		}
 		TR0 = 1;//´ò¿ª¼ÆÊ±Æ÷
 	}
+=======
+	
+>>>>>>> parent of 838f16f... è¯´æ˜ï¼šä¿®æ”¹è‡³æœ€æ–°ï¼ŒæŒ‰é”®æœ‰å¤§çš„æ”¹åŠ¨ï¼Œå¢åŠ ä¿¡å·æ£€æµ‹ç«¯å£ã€‚
 	
 }
 void main()
@@ -178,8 +178,12 @@ void main()
 	{
 //		EA = 1;
 //		TR0 = 1;
+<<<<<<< HEAD
 		AD0 = Get_ad_result(2);		
 		AD = Get_ad_result(3);
+=======
+		AD = Get_ad_result(5);
+>>>>>>> parent of 838f16f... è¯´æ˜ï¼šä¿®æ”¹è‡³æœ€æ–°ï¼ŒæŒ‰é”®æœ‰å¤§çš„æ”¹åŠ¨ï¼Œå¢åŠ ä¿¡å·æ£€æµ‹ç«¯å£ã€‚
 		UserData_Claculite();
 		if(Change_Num) Current_Time = 0;//´Ë¾äÊÇÎªÁËÔÚĞŞÕıÊÇÊı¾İÊä³ö¿Ú²»·´×ªÓÃµÄ
 		switch(SYS_STEP)// Õû¸öÏµÍ³Ö´ĞĞÁ÷³Ì

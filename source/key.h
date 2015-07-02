@@ -1,6 +1,7 @@
 #ifndef _key_h_
 #define _key_h_
 #include <STC15F2K60S2.H>
+<<<<<<< HEAD
 //sbit Key_Up =   P1^2;
 //sbit Key_Down=	P1^3;
 //sbit Key_Choose=P1^4;
@@ -11,6 +12,13 @@ sbit Key_Down=	P1^5;
 sbit Key_Choose=P5^4;
 sbit Key_Debug    =P5^5;//µ÷ÊÔ°´¼ü
 //sbit Key_Lock    =P5^5;//Ëø¶¨¶¨¶Ë¿Ú
+=======
+sbit Key_Up =   P1^2;
+sbit Key_Down=	P1^3;
+sbit Key_Choose=P1^4;
+sbit Key_Debug    =P5^4;//µ÷ÊÔ°´¼ü
+sbit Key_Lock    =P5^5;//Ëø¶¨¶¨¶Ë¿Ú
+>>>>>>> parent of 838f16f... è¯´æ˜ï¼šä¿®æ”¹è‡³æœ€æ–°ï¼ŒæŒ‰é”®æœ‰å¤§çš„æ”¹åŠ¨ï¼Œå¢åŠ ä¿¡å·æ£€æµ‹ç«¯å£ã€‚
 #define UP     1
 #define DOWN   2
 #define CHOOSE 3

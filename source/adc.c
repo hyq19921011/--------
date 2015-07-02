@@ -13,9 +13,15 @@ void AD_delay(unsigned int n)       //N usÑÓÊ±º¯Êý
 
 void AD_init()//10Î»
 {
+<<<<<<< HEAD
 	P1ASF|=0x0c;       //½«P1^2¿ÚºÍ1^3×÷ÎªADC¹¦ÄÜÊ¹ÓÃ
 	CLK_DIV&=~0x20;      //0000,0100 Áî ADRJ=1£¬10Î»A/D×ª»»½á¹ûµÄ¸ß2Î»´æ·ÅÔÚADC_RESµÄµÍ2Î»ÖÐ£¬µÍ8Î»´æ·ÅÔÚADC_RESLÖÐ
 	ADC_CONTR = ADC_POWER | ADC_SPEEDH; //1110,0000 Áî ADC_POWER=1£¬½«ADCµçÔ´´ò¿ª£¬ SPEED1£¬SPEED0£ºÄ£Êý×ª»»Æ÷×ª»»ËÙ¶È¿ØÖÆÎ»
+=======
+	P1ASF|=0x20;       //½«P1^5¿Ú×÷ÎªADC¹¦ÄÜÊ¹ÓÃ
+	AUXR1|=0x04;      //0000,0100 Áî ADRJ=1£¬10Î»A/D×ª»»½á¹ûµÄ¸ß2Î»´æ·ÅÔÚADC_RESµÄµÍ2Î»ÖÐ£¬µÍ8Î»´æ·ÅÔÚADC_RESLÖÐ
+	ADC_CONTR = 0xE0; //1110,0000 Áî ADC_POWER=1£¬½«ADCµçÔ´´ò¿ª£¬ SPEED1£¬SPEED0£ºÄ£Êý×ª»»Æ÷×ª»»ËÙ¶È¿ØÖÆÎ»
+>>>>>>> parent of 838f16f... è¯´æ˜Žï¼šä¿®æ”¹è‡³æœ€æ–°ï¼ŒæŒ‰é”®æœ‰å¤§çš„æ”¹åŠ¨ï¼Œå¢žåŠ ä¿¡å·æ£€æµ‹ç«¯å£ã€‚
 	
 	ADC_RES=0;     //¸ß°ËÎ»Êý¾ÝÇåÁã,STC12C5A60S2 ADÊý¾Ý¼Ä´æÃûÓëSTC12C54¡Á¡ÁÏµÁÐ²»Í¬
 	ADC_RESL=0;    //µÍÁ½Î»ÇåÁã
